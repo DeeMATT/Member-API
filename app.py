@@ -11,7 +11,21 @@ def close_db(error):
 @app.route('/member', methods=['GET'])
 def get_members():
     db = get_db()
-    return 'The returns all member'
+
+    members_cur = db.execute('SELECT * FROM members')
+    members = members_cur.fetchall()
+
+    return_values = []
+    for member in members:
+        member_dict = {}
+        member_dict['id'] = member[0]
+        member_dict['name'] = member[1]
+        member_dict['email'] = member[2]
+        member_dict['level'] = member[3]
+
+        return_values.append(member_dict)
+
+    return jsonify(return_values)
 
 @app.route('/member/<int:member_id>', methods=['GET'])
 def get_member(member_id):
@@ -32,7 +46,7 @@ def add_member():
     member_cur = db.execute('SELECT id, name, email, level FROM members WHERE name = ?', [name])
     new_member = member_cur.fetchone()
 
-    return jsonify(id=new_member['id'], name=new_member['name'], email=new_member['email'], level=new_member['level'])
+    return jsonify({'id': new_member[0], 'name': new_member[1], 'email': new_member[2], 'level': new_member[3]})
 
 @app.route('/member/<int:member_id>', methods=['PUT', 'PATCH'])
 def edit_member(member_id):
